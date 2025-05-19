@@ -9,18 +9,25 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State var numberOfItems: Int = 0
+    @State var items: [Int] = []
     @State var scrollPosition: ScrollPosition = .init(id: 0)
     var body: some View {
         VStack {
 
             ScrollView(.horizontal) {
                     HStack(alignment: .center) {
-                        ForEach(0..<numberOfItems, id: \.self) {i in
+
+                        ForEach(items, id: \.self) { item in
                             Rectangle()
                                 .fill(Color.red)
                                 .frame(width: 100, height: 100)
-                                .id(i)
+                                .id(item)
+                                .onTapGesture {
+                                    withAnimation {
+                                        let idx = items.firstIndex(where: { $0 == item}) ?? 0
+                                        items.remove(at: idx)
+                                    }
+                                }
                         }
                     }
                     .scrollTargetLayout()
@@ -30,9 +37,9 @@ struct ContentView: View {
             .scrollPosition($scrollPosition)
 
             Button("Add Item") {
-                numberOfItems += 1
+                items.append(items.count)
                 withAnimation {
-                    scrollPosition = .init(id: (numberOfItems-1))
+                    scrollPosition = .init(id: (items.count-1))
                 }
             }
             .frame(width: 100, height: 100)
